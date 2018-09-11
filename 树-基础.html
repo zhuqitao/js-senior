@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+
+	<script type="text/javascript">
+		
+	/* 概念：树是一种非线性的数据结构，由n(n>=0)个节点组成的集合
+		n=0 空树
+		n>0, 树有一个根节点，根节点没有父节点
+		除了跟节点之外的其余数据元素被分为m(m>0)个个互不交互的集合，每个集合本身也是一个数，被称为原树的子树
+		每个节点也是一个数
+
+		节点： 包含数据项，和指向其他节点的指针
+
+		节点的度：节点指向其他节点的个数，也就是箭头的个数
+
+		叶节点：度为0的节点称为叶节点
+
+		分支节点：除了叶节点外的节点，就是分支节点
+
+		子女节点：节点的直接子节点
+
+		父节点：直接父节点
+
+		兄弟节点：同一个父节点的子女节点就是兄弟节点
+
+		祖先节点：从跟节点到某节点，所经过的所有的节点都是该节点的祖先节点
+
+		子孙节点：某一个节点下面的所有节点
+
+		节点所在层次：
+
+		树的深度：距离根节点最远的节点所处的层析及时树的深度
+
+		树的高度：叶节点的高度为1，非叶节点的高度是他子女节点敢赌的最大值加1，高度与深度相等
+
+		树的度：树中节点最大的度
+
+		有序树：
+
+		无序树：
+
+		森林： 多个树的集合
+
+
+		2. 二叉树：每个节点最多有两个子女，分别称为左子女，和右子女，不存在度大于2的节点，
+		子树有左右之分，不能变
+
+		二叉树的性质：
+			二叉树的第i层，最多有2的（i-1）次方个节点
+			深度为k的二叉树，最少有k个节点，最多有2的（k-1）次方个节点
+			对于一个树，非二叉树，叶节点的数量等于
+		
+		满二叉树：深度为k的有2（k-1）次方个节点，
+		完全二叉树：深度为k的树，从1到k-1都是满的，第k层，或是满的或是不满的
+	*/
+	function Stack () {
+
+		// 不要this.items = []  这样会把items暴露  var a = new Stack()  a.items 就可以获取items了
+		var items = [];
+
+		// 从栈顶添加元素，也叫压栈
+		this.push = function(item) {
+			items.push(item)
+		}
+
+		// 弹出栈顶元素
+		this.pop = function() {
+			return items.pop()
+		}
+
+		// 返回栈顶元素
+		this.top = function() {
+			return items[items.length-1]
+		}
+
+		// 判断栈是否为空
+		this.isEmpty = function() {
+			return items.length === 0
+		}
+		// 返回栈的大小
+		this.size = function() {
+			return items.length
+		}
+		// 清空栈
+		this.clear = function() {
+			items = []
+		}
+	}
+
+	// 定义一个节点
+	var BinTreeNode = function(data) {
+		this.data=data
+		this.leftChild = null		// 左节点
+		this.rightChild=null		// 又节点
+		this.parentNode = null		// 父节点
+	}
+
+	// 定义二叉树
+	function BinaryTree() {
+		var root = null;	// 根节点
+
+		// 初始化一个树 使用广义表自定义树
+		/*
+			广义表：A(B(D,E(G,)),C(,F))#
+		*/
+
+		/*
+			遇到左括号，说明前面有一个节点，因为每个节点都是字母开头，不能是左括号开头这个括号里面的两个节点都是他的子节点，但是子节点后面还有子节点，
+			因袭，需要一个先进后出的数据结构，就是栈，
+			如果遇到右括号，说明左右两个节点都分析完了，
+		*/
+
+		this.init = function(string) {	
+			var stack = new Stack()
+			var k = 0		// 标识左节点还是右节点 1: 左节点 2：右节点
+			var new_node = null;
+
+			for(var i=0;i<string.length;i++) {
+				var item = string[i]
+
+				if(item == '#') {
+					break;
+				}
+				if(item == '(') {
+					stack.push(new_node)
+					k = 1
+				} else if(item == ','){
+					k = 2
+
+				}else if(item == ')'){
+					stack.pop()
+				}else {
+					new_node = new BinTreeNode(item)	// 创建节点
+					if(root==null) {
+						root = new_node
+					} else {
+						// 寻找父节点，父节点就在栈里面，就在栈顶
+						if(k == 1){
+							// 说明是左节点
+							var top_item = stack.top();
+							top_item.leftChild = new_node
+							new_node.parentNode = top_item
+
+						}else if(k==2){
+							// 右节点
+							var top_item = stack.top();
+							top_item.rightChild = new_node
+							new_node.parentNode = top_item 
+						}
+					}
+				}
+			}
+		}
+
+		// 返回根节点
+		this.get_root = function(){
+			return root
+		}
+
+		/* 
+			中序遍历
+			先遍历左节点，再打印当前节点，再遍历右节点
+		 */
+		this.in_order=function(node) {
+			if(node==null) {
+				return
+			}
+			this.in_order(node.leftChild)
+			console.log(node.data)
+			this.in_order(node.rightChild)
+			
+		}
+		/*
+			前序遍历
+			先打印当前节点，再打印左节点，然后右节点
+		*/
+		this.pre_order = function(node) {
+			if(node == null) {
+				return
+			}
+			console.log(node.data)
+			this.pre_order(node.leftChild)
+			this.pre_order(node.rightChild)
+		}
+
+		/*
+			后序遍历
+			先打印左节点，然后右节点，再打当前节点
+		*/
+		this.post_order = function(node) {
+			if(node == null) {
+				return
+			}
+			this.post_order(node.leftChild)
+			this.post_order(node.rightChild)
+			console.log(node.data)
+		}
+
+		// 以传入节点为根节点，返回该下的节点数量(左子树的节点数量+右子树的节点数量+1)
+		var tree_node_count = function(node) {
+			if(node == null) {
+				return 0
+			}
+			var left_node_count = tree_node_count(node.leftChild)
+			var right_node_count = tree_node_count(node.rightChild)
+			return left_node_count+right_node_count+1
+		}
+		// 返回节点数量
+		this.size = function() {
+			return tree_node_count(root)
+		}
+
+
+		// -----------------------
+
+		// 返回树的高度, 以传入的节点为根节点，计算高度
+		var tree_height = function(node) {
+			if (node == null) {
+				return 0
+			}
+			// 先计算左子树的高度
+			var left_child_height = tree_height(node.leftChild);
+			// 在计算有子树的高度
+			var right_child_height = tree_height(node.rightChild);
+
+			// 比较大小，返回最大的高度
+			if(left_child_height > right_child_height) {
+				return left_child_height + 1
+			} else {
+				return right_child_height + 1
+			}
+		}
+		this.height = function() {
+			return tree_height(root)
+		}
+
+		//--------------------------------
+		// 查找一个节点函数, 从传入的节点开始找值为data的节点
+		var find_node = function(node, data) {
+			if (node == null) {
+				return null
+			}
+			// 如果传入节点的值为data，则找到了  直接返回
+			if(node.data == data) {
+				return node
+			}
+
+			// 先查询左子树
+			var left_res = find_node(node.leftChild, data);
+
+			if(left_res) {
+				// 如果在左子树找到了
+				return left_res
+			}
+			var right_res = find_node(node.rightChild, data)
+			return right_res
+
+		}
+		this.find = function(data) {
+			return find_node(root,data)
+		}
+	}
+
+	var bt = new BinaryTree()
+	bt.init('A(B(D,E(G,)),C(,F))#')
+	var root_node = bt.get_root()
+	bt.in_order(root_node)
+	console.log(bt.size())
+	console.log(bt.height())
+	console.log(bt.find('B'))
+	// console.log(bt.get_root())
+
+
+	// -----------------------
+	// 练习题
+
+	// 求一棵树的的镜像 （做节点和右节点互换）
+	// 两种方法：
+	// （1）：
+	var mirror_1 = function(node) {
+		if(node == null) {
+			return
+		}
+		var temp = node.leftChild
+		node.leftChild = node.rightChild
+		node.rightChild = temp
+
+		mirror_1(node.leftChild)
+		mirror_1(node.rightChild)
+	}
+	// （2）：
+	var mirror_2 = function() {
+		if(node == null) {
+			return
+		}
+
+		var left = mirror_2(node.leftChild)
+		var right = mirror_2(node.rightChild)
+
+		node.leftChild = right
+		node.rightChild = left
+
+		return node
+	}
+
+	// 使用非递归方式实现前序遍历
+	/* 
+		递归转为非递归，需要使用while循环
+		递归：先处理当前节点，再处理左节点，然后右节点
+		迭代：先处获取curr_node,然后curr_node的左节点，这时需要把右节点入栈，
+			 然后再吧左节点作为当前节点curr_node,继续处理
+			 当找不不到左节点，再从栈里面弹出顶栈，开始处理右节点
+
+	*/
+	function pre_order_while(node) { 
+		var stack = new Stack()
+
+		var curr_node = node
+
+		while(curr_node){
+			console.log(curr_node.data)
+			if(curr_node.rightChild){
+				stack.push(curr_node.rightChild)
+			}
+
+			if(curr_node.leftChild) {
+				curr_node = curr_node.leftChild
+			} else {
+				// 找不到左子树, 然后处理右子树
+				
+				curr_node = stack.pop()
+			}
+		}
+	}
+	pre_order_while(bt.get_root())
+
+
+	// -----------------------
+	// 课后作业
+
+	// 1: 使用非递归方式实现中、后序遍历			(普通)
+	// 2: 寻找两个节点最近的公共祖先节点			(困难)
+	// 3: 分层打印二叉树						(困难+)
+	// 4： 输出指定层的节点个数					(困难+)
+
+	</script>
+</head>
+<body>
+
+</body>
+</html>

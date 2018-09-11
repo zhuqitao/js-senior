@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script type="text/javascript">
+		
+		// 创建节点
+		// var Node = function(data) {
+		// 	this.data = data;
+		// 	this.next = null
+		// }
+
+		// var node1 = new Node(1)
+		// var node2 = new Node(2)
+		// var node3 = new Node(3)
+
+		// node1.next = node2
+		// node2.next = node3
+
+		// console.log(node1.data)
+		// console.log(node1.next.data)
+		// console.log(node1.next.next.data)
+
+		// 定义链表类
+
+		// function LinkList () {
+
+		// 	var Node = function(data) {
+		// 		this.data = data;
+		// 		this.next = null
+		// 	}
+
+		// 	var length = 0;		// 长度
+		// 	var head = null;		// 头节点
+		// 	var tail = null;		// 尾节点
+
+		// 	this.append = function(data) {
+		// 		// 创建新节点
+		// 		var new_node = new Node(data);
+
+		// 		if (head == null) {
+		// 			head = new_node;
+		// 			tail = new_node;
+		// 		} else {
+		// 			tail.next = new_node;
+		// 			tail = new_node;
+		// 		}
+		// 		length += 1
+		// 		return true;
+		// 	}
+
+		// 	this.print = function() {
+		// 		var curr_node = head;
+		// 		while(curr_node) {
+		// 			console.log(curr_node.data);
+		// 			curr_node = curr_node.next;
+		// 		}
+		// 	}
+
+		// 	this.insert = function(index, data) {
+		// 		if (index < 0 || index > length) {
+		// 			return false
+		// 		} else if (index == length) {
+		// 			return this.append(data)
+		// 		} else {
+		// 			var new_node = new Node(data);
+		// 			if (index == 0) {
+		// 				// new_node 变成新节点
+		// 				new_node .next = head;
+		// 				head = new_node;
+		// 			} else {
+		// 				var insert_index = 1;
+		// 				var curr_node = head;
+		// 				while(insert_index < index) {
+		// 					insert_index +=1;
+		// 					curr_node = curr_node.next
+		// 				}
+
+		// 				// 当循环结束
+		// 				var next_node = curr_node.next;
+		// 				curr_node.next = new_node;
+		// 				new_node.next = next_node
+		// 			}
+		// 			length+=1
+		// 			return true
+		// 		}
+		// 	}
+
+		// 	this.remove = function(index) {
+		// 		if (index < 0 || index >+ length) {
+		// 			return false
+		// 		} else {
+		// 			var del_node = null;
+		// 			if(index == 0) {
+		// 				del_node = head;
+		// 				head = head.next;
+		// 			} else {
+		// 				var del_index = 0;
+		// 				var pre_node = null;		// 被删除元素之前的一个元素
+		// 				var curr_node = head;		// 被删除的元素
+
+		// 				while(del_index < index) {
+		// 					del_index +=1;
+		// 					pre_node = curr_node
+		// 					curr_node = curr_node.next
+		// 				}
+
+		// 				del_node = curr_node;
+		// 				pre_node.next = curr_node.next
+
+		// 				// 如果被删除的元素是尾节点
+		// 				if (curr_node.next = null) {
+		// 					tail = pre_node
+		// 				}
+		// 				length -= 1;
+		// 				del_node.next = null;		// 可不写
+		// 			}
+		// 		}
+		// 	}
+
+		// 	this.get = function(index) {
+		// 		if (index < 0 || index >= length) {
+		// 			return false
+		// 		} 
+		// 		 var node_index = 0;
+		// 		 var curr_node = head;
+
+		// 		 while(node_index < index) {
+		// 		 	node_index += 1;
+		// 		 	curr_node = curr_node.next
+		// 		 }
+		// 		  return curr_node.data
+		// 	}
+
+		// 	this.indexOf = function() {}
+		// }
+
+		// var link = new LinkList()
+		// link.append(2)
+		// link.append(4)
+		// link.print()
+
+		// 链表的方法
+		// append 添加一个元素,只能在链表末尾添加元素
+		// insert 可以在指定位置添加元素，需要传index 表明插入之后改元素所在的位置，重点在于找到index-1的节点
+		// remove 删除指定位置的节点
+		// get 
+		// indexOf
+
+
+
+		// 基于链表实现栈Stack 和队列 Queue
+
+		// 链表翻转 （特别重要）
+		// 1 使用迭代实现翻转
+		/**
+			思路：
+			curr_node: 当前节点
+			pre_node:  上一个节点
+			next_node: 下一个节点
+
+			(1) 先使用curr_node.next = pre_node 完成一个节点的反转
+			(2) 在遍历过程中 每完成一次反转，就让curr_node = next_node, 找到下一个需要反转的节点，
+			同时pre_node和next_node也跟随curr_node一起向后滑动
+			(3) 考虑边界条件，头节点与尾节点
+		*/
+
+		function reverse_iter (head) {
+			if (!head) {
+				return null
+			}
+			var pre_node = null;	// 上一个节点 第一次为空
+			var curr_node = head;	// 当前反转的节点
+
+			while(curr_node) {
+				var next_node = curr_node.next;		// 下一个节点
+				curr_node.next = pre_node;			// 对当前节点反转
+				pre_node = curr_node;				// pre_node 向后滑动
+				curr_node = next_node;				// curr_node 向后滑动
+			}
+
+			// 当循环结束，说明curr_node=null，也就是说pre_node就是循环过程中的最后一个节点
+			// 当反转结束之后 pre_node 也就是变成了头节点
+			// 返回最后一个节点
+			return pre_node;
+		}
+
+		// 2. 使用递归实现反转链表
+		// 递归的精髓在于甩锅，你做不到的事，让别人去做，别人做完了，你再在别人的基础上继续做
+		/* 递归分为4步
+			(1): 明确函数的功能，告诉别人需要去做什么，
+
+				就翻转而言，函数的功能就是从传的参数那个节点开始翻转，函数返回值就是翻转之后的头节点
+			(2): 正式甩锅，进行递归调用，就翻转而言，甩锅的方法：
+
+					重新调用改函数，从下一个节点开始翻转
+					var new_head = reverse_digui(head.next)
+				原本是翻转以head开头的链表，可是你不会，那就先让别人从head.next
+				开始翻转，等他翻转完，得到的 new_head 就是翻转后的头节点
+			(3): 根据被人的计算结果，计算自己的结果，现在只需要把head节点连接到新链表上
+
+				现在需要把head链接到新链表。 因为是从head.next开始翻转的，所以现在新链表的尾节点就是head.next
+				执行head.next.next = head,这样head就成了新链表的尾节点
+			(4): 找到递归终止的条件，否者会陷入死循环，
+
+				这里结束条件就是如果递归遇到
+		*/
+
+		function Node(data) {
+			this.data = data;
+			this.next = null
+		}
+
+		var node1 = new Node(1);
+		var node2 = new Node(2);
+		var node3 = new Node(3);
+
+		node1.next = node2
+		node2.next = node3
+		node3.next = null
+
+		function print (node) {
+			var curr_node = node
+			while(curr_node) {
+				console.log(curr_node.data)
+				curr_node = curr_node.next
+			}
+		}
+
+		function reverse_digui(head) {
+			// 如果head是null 不合法
+			if (!head) {
+				return null;
+			}
+			// 终止条件 如果head.next为null 说明head就是尾节点，直接返回
+			if (head.next == null) {
+				return head;
+			}
+
+			var new_head = reverse_digui(head.next);
+			head.next.next = head;
+			head.next = null;
+			return new_head
+
+		}
+
+		print(reverse_digui(node1))
+
+
+	</script>
+</head>
+<body>
+
+</body>
+</html>
