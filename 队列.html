@@ -4,6 +4,39 @@
 	<title></title>
 
 	<script type="text/javascript">
+		function Stack () {
+
+		// 不要this.items = []  这样会把items暴露  var a = new Stack()  a.items 就可以获取items了
+		var items = [];
+
+		// 从栈顶添加元素，也叫压栈
+		this.push = function(item) {
+			items.push(item)
+		}
+
+		// 弹出栈顶元素
+		this.pop = function() {
+			return items.pop()
+		}
+
+		// 返回栈顶元素
+		this.top = function() {
+			return items[items.length-1]
+		}
+
+		// 判断栈是否为空
+		this.isEmpty = function() {
+			return items.length === 0
+		}
+		// 返回栈的大小
+		this.size = function() {
+			return items.length
+		}
+		// 清空栈
+		this.clear = function() {
+			items = []
+		}
+	}
 		
 	// 队列  先进先出
 
@@ -163,6 +196,46 @@
 		}
 	}
 	print_yanghui(5)
+
+
+	// 两个栈实现一个队列
+	function StackQueue() {
+		var stack_1 = new Stack()
+		var stack_2 = new Stack()
+
+		// 总是把数据放到stack_1
+		this.enqueue = function(item) {
+			stack_1.push(item)
+		}
+
+		this.head = function() {
+			// 两个栈都是空
+			if(stack_1.isEmpty() && stack_2.isEmpty()) {
+				return null
+			}
+
+			// 如果stack_2是空的 那么stack_1 一定不是空
+			if(stack_2.isEmpty()) {
+				while(!stack_1.isEmpty) {
+					stack2.push(stack_1.pop())
+				}
+			}
+			return stack_2.top()
+		}
+
+		this.dequeue = function() {
+			if(stack_1.isEmpty() && stack_2.isEmpty()) {
+				return null
+			}
+
+			if(stack_2.isEmpty()) {
+				while(!stack_1.isEmpty()) {
+					stack_2.push(stack_1.pop())
+				}
+			}
+			return stack_2.pop()
+		}
+	}
 
 
 
