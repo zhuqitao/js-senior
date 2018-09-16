@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+
+	<script type="text/javascript">
+		
+	// 概念
+	/*
+		实现优先级队列  堆是最高效的实现方式，所谓优先级队列  就是队列是按照优先级出队列  不是按照先进先出
+		关键码：
+			假定在数据记录中存在一个能够标识数据记录的数据项，并课根据该数据项对数据进行组织
+			则称此数据项为关键码，（应该就是指数据的值）
+
+		比如有一个关键码集合K = {k0,k1,k2...},把他所有的元素按照完全二叉树的顺序存储方式放在
+		一个一维数组中，并满足k(i) <= k(2i+1) 且k(i)<=k(2i+2), i = 0,1,2... 则称这个集合为最小堆，
+		如果k(i) >= k(2i+1) 且k(i)>=k(2i+2),则称为最大堆
+
+		在最小堆中父节点的关键码小于他的左右子节点的关键码，在最大堆父节点的关键码大于他的左右子节点的关键码
+
+		堆就是一个完全二叉树
+
+		如果堆放在数组中，就是按照二叉树的层数来放数据。先放第一层，然后第二层... ， 每一层从左到右放
+
+		       8
+		   10      16
+	    15    11  20
+	    放在数组中就是[8,10,16,15,11,20] 
+
+	    数组的索引为i, 数组的长度为n
+			1、 如果i=0，则为根节点,否则节点i的父节点就是(i-1)/2
+			2、 一个节点的索引为i, 则他的左子节点索引为2*i+1,右子节点索引为2*i+2
+			3、 一个节点索引为i,如果2*i+1>n-1，说明他没有左子节点，因为2*i+1 大于数组的长度了
+			4、 一个节点索引为i,如果2*i+2>n-1，说明他没有右子节点，因为2*i+2 大于数组的长度了
+	*/
+
+	// 实现一个最小堆
+	function MinHeap(size) {
+		var heap = new Array(size);
+
+		var curr_size = 0;		// 当前堆的大小
+		var max_size = size;	// 堆的最大容量
+
+		// ------------------------
+		// 初始化一个最小堆
+		this.init = function(arr) {
+			max_size = arr.length
+			curr_size = max_size
+
+			heap = new Array(arr.length)
+			for (let i = 0;i<curr_size;i++) {
+				heap[i] = arr[i]
+			}
+
+			// 寻找堆的最后一个分支节点的索引，堆的最后一个分支节点就是数组最后一个元素的父节点
+			// 所以堆的最后一个分支节点的索引就是 (curr_size - 1 - 1)/2
+			var curr_pos = Math.floor((curr_size - 2)/2)
+
+			while(curr_pos >= 0) {
+				shift_down(curr_pos, curr_size - 1)
+			}
+		}
+		// start 节点的开始位置  m: 数组的长度
+		function shift_down(start, m) {
+			// 从start这个位置，向下滑调整
+			var parent_index = start					// start就是当前这个局部的父节点
+			var min_child_index = parent_index*2 + 1	// 一定有左子节点，现在min_child_index 就是左子节点的索引
+
+			while(min_child_index <= m) {
+				if (min_child_index<m && heap[min_child_index]> head[min_child_index+1]){
+					// min_child_index + 1 就是右子节点的索引, 如果右子节点比左节点小，就把min_child_index 指向最小的那个
+					min_child_index = min_child_index + 1
+				}
+
+				if(heap[parent_index] <= heap[min_child_index]) {
+					// 如果父节点小于等于最小的子节点  则不需要调整  循环结束
+				} else {
+					// 父节点个子节点的值互换
+					var tep = heap[parent_index]
+					heap[parent_index] = heap[min_child_index]
+					heap[min_child_index] = tep
+
+					// 然后开始下一轮循环，让下一轮的父节点等于现在最小的节点，min_child_index 指向他的左子节点
+					parent_index = min_child_index
+					min_child_index = min_child_index*2 + 1
+				}
+			}
+		}
+
+		// ------------------------
+		// 实现insert方法
+		/*
+			insert奖新的元素插入到堆中，添加到数组的末尾，也就是添加到树的最后一层的最右边
+			然后再和他的父节点比较，然后再依次网上比较
+		*/
+		this.insert = function(item) {
+			if(curr_size == max_size) {
+				// 满了
+				return false
+			}
+			heap[curr_size] = item
+			shift_up(curr_size)
+			curr_size++
+			return true
+		}
+
+		shift_up(start) {
+			// 当前节点是叶节点
+			var child_index = start;
+
+			var parent_index = Math.floor((child_index-1)/2)
+
+			while(child_index > 0) {
+				if(heap[parent_index] <= heap[child_index]){
+					break;
+				} else {
+					var tmp = heap[child_index]
+					heap[child_index] = heap[parent_index]
+					heap[parent_index] = tmp
+
+					child_index = parent_index
+					parent_index = Math.floor((child_index-1)/2)
+				}
+			}
+		}
+
+		// 删除最小堆的堆顶删除
+		/*
+			先把最后一个元素放在堆顶，然后再执行shift_sown
+		*/
+		this.remove_min = function() {
+			if(curr_size <= 0) {
+				return null;
+			}
+			var min_value = heap[0]
+			heap[0] = heap[curr_size-1]
+			curr_size--
+			shift_down(0, curr_size-1)
+			return min_value
+		}
+
+		// 实现 size.print,get_min 方法
+	}
+
+	// ————————————————————————————————
+	// 最小堆的应用
+	// 1. 排序
+	/*
+		每次把堆顶元素拿出来（删除），放到新数组中，直到堆没有元素
+	*/ 
+	var arr = [11, 73,1,39,38]
+	var min_heap = new MinHeap(5)
+	for(let i =0; i<arr.length;i++) {
+		min_heap.insert(arr[i])
+	}
+	var sort_arr = []
+	for (let i = 0; i<arr.length; i++){
+		sort_arr.push(min_heap.remove_min())
+	}
+	console.log(sort_arr)
+	// 2 Top k 一个非常大的数据集合有一亿个数，求集合中的最大的k个数
+	/*
+		思路：
+			使用最小堆，初始化一个大小为k的最小堆，先放k个数,这是堆顶最先，
+			集合中剩余的数和一次和堆顶元素比较，如果比堆顶元素大，就删除堆顶元素，
+			并放入新的元素，全部比较完，堆里的元素就是最大的k个值
+		延伸：如果找一亿个数最小的k个数，就使用最大堆
+
+	*/
+	// 找到最大的3个数
+	var arr [5,2,9,6,8,5,15]
+	var min_heap = new MinHeap(3)
+	for(var i = 0; i<3; i++) {
+		min_heap.insert(arr[i])
+	}
+	for (var i = 3; i<arr.length;i++) {
+		var item = arr[i]
+		if(item>min_heap.get_min()) {
+			min_heap.remove_min()
+			min_heap.insert(item)
+		}
+	}
+	min_heap.print()
+
+	// 课后作业  实现最大堆
+
+	// ————————————————————————————————
+	// 哈弗曼树
+	/*
+		概念：
+		1. 路径长度
+			路径：从数中一个节点到另一个节点之间的分支构成两点之间的路径
+			路径长度：路径上的分支条数，树的路径长度是从根节点到每一个节点的路径总和
+
+		节点数相同的情况下，完全二叉树的路径长度最小
+
+		2. 带权路径长度
+	*/
+
+
+	</script>
+</head>
+<body>
+
+</body>
+</html>
