@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script type="text/javascript">
+		
+	// 哈弗曼树
+	/*
+		概念：
+		1. 路径长度
+			路径：从树中一个节点到另一个节点之间的分支构成两点之间的路径
+			路径长度：树的路径长度是从根节点到每一个节点的路径总和
+
+		节点数相同的情况下，完全二叉树的路径长度最小
+
+		2. 带权路径长度
+		有一个集合w={w(1),w(2),w3...w(n)}, 其中w(i)>=0,1<=i<n,若T是一个有n个叶节点的数，
+		将权值w(i)分别赋值给T的n个叶节点，则称T是权值为w(i)的扩充二叉树，带有权值的叶节点又
+		叫做扩充二叉树的外节点，其余的不带权值的节点称为内节点。
+
+		外节点的带权路径长度为根节点到该节点的路径长度l(i)与该节点的权值w(i)乘积，n个外节点的扩充二叉树的
+		带权路径长度则为所有的外节点的带权路径长度之和：
+
+					WPL = w(1)*l(1) + w(2)*l(2) + ... +w(n)*l(n)
+
+		WPL最小的二叉树又称为最优二叉树，也就是哈弗曼树
+
+		其实哈弗曼树就是权值越高的叶节点距离根节点越远
+	*/
+
+	/*
+		如何构建一个哈弗曼树？
+		
+			(1) 假如给定n个权值{w(1),w(2),w3...w(n)},构造n个节点，每个节点都作为一棵带权的扩充二叉树，所以就构成了
+			有n棵树的森林F = {T(1),T(2)...T(n)},每个扩充二叉树T(i)都是只有一个带权W(i)的根节点，左右子树都为空
+		
+			(2) 重复以下步骤，直到F中只剩下一棵树为止
+				a. 在F中选取两个根节点权值最小的扩充二叉树，把这两个树作为左右子树构建一个新的
+					二叉树，这个新的二叉树的根节点的权值就是其左右子树的权值和
+				b. 在F中删除第一步选取的两颗二叉树
+				c. 将第一步中创建的新的二叉树加入到F中
+			最后的到的就是哈弗曼树 
+
+	*/
+	/*
+		哈弗曼树的使用场景，在通信领域，经过哈弗曼树编码的信息消除大量冗余信息。
+		一段信息由a b c d e 5个字符组成，各自出现的概率为0.12，0.4，0.15，0.08，0.25，
+		把这几个字符串编码成二进制的0，1序列，一种是使用定长编码，另一种是变长编码
+		
+			符号  概率  定长编码  变长编码
+			 a   0.12    000     1111
+			 b   0.40    001     1
+			 c   0.15    010     110
+			 d   0.08    011     1110
+			 e   0.25    100     10
+		
+		如果采用定长编码，平均编码长度为(0.12+0.4+0.15+0.08+0.25)*3 = 3
+		如果采用变长编码，平均编码长度为0.12*4 + 0.4*1 + 0.15*3 + 0.08*4 + 0.25*2 = 2.15
+
+		利用哈弗曼树就可以帮助生成变长编码的二进制码
+	*/
+
+	// 还是上题，利用上面提供的编码出现的概率作为权值，来实现一个哈弗曼树
+
+	// 准备编码数据
+	var code_dict = {
+		'a':0.12,
+		'b':0.4,
+		'c':0.15,
+		'd':0.08,
+		'e':0.25
+	}
+
+	// 编码的类
+	function CodeNode(code, rate) {
+		this.code = code;	// 字符
+		this.rate = rate;	// 概率
+	}
+	// 定义树的节点
+	function TreeNode(data) {
+		this.data = data
+		this.leftChild = null;
+		this.rightChild = null;
+		this.parent = null;
+	}
+	
+	// 森林数组
+	var forest = [];
+	for (var key in code_dict) {
+		var item = new CodeNode(key,code_dict[key])
+		forest.push(new TreeNode(item))
+	}
+
+	// 定义哈夫曼类
+	function HuffmanTree() {
+		var root = null;
+
+		this.init = function(arr) {
+			var min_heap = new MinHeap(arr.length)
+			min_heap.init(arr)
+
+			for(var i=0; i<arr.length-1;i++) {
+				// 找到最小的两个节点
+				var min_tree1 = min_heap.remove_min()
+				var min_tree2 = min_heap.remove_min()
+
+				// 计算新节点的权值，并创建新节点
+				var new_rate = min_tree1.data.rate+min_tree2.data.rate
+				var new_item = new CodeNode('', new_rate)
+				var new_node = new TreeNode(new_item)
+
+				min_heap.insert(new_node)
+
+				new_node.leftChild = min_tree1
+				new_node.rightChild = min_tree2
+				min_tree1.parent = new_node
+				min_tree2.parent = new_node
+
+				
+
+				root = new_node
+			}
+		}
+
+		var get_code_from_tree = function(node, dict, code_str){
+	        
+	        if(node.leftChild){
+	            get_code_from_tree(node.leftChild, dict, code_str+"0");
+	        }
+	        if(node.rightChild){
+	            get_code_from_tree(node.rightChild, dict, code_str+"1");
+	        }
+
+	        if(!node.leftChild && !node.rightChild){
+	            // 页节点
+	            dict[node.data.code] = code_str;
+	            return;
+	        }
+	    };
+
+		this.get_code = function(){
+			var obj = {}
+			get_code_from_tree(root, obj, '')
+			return obj
+		}
+		this.print = function() {
+			console.log(root)
+		}
+	}
+
+	var hf = new HuffmanTree()
+	hf.init(forest)
+	console.log(hf.get_code())
+
+
+
+
+
+
+
+function MinHeap(size){
+    var heap = new Array(size);
+    var curr_size = 0;
+    var max_size = size;
+
+
+    var shif_down = function(start, m){
+        // 从start这个位置开始,向下下滑调整
+        var parent_index = start;                       // start就是当前这个局部的父节点
+        var min_child_index = parent_index*2 + 1;       // 一定有左孩子,先让min_child_index等于左孩子的索引
+
+        while(min_child_index <= m){
+            // min_child_index+1 是右孩子的索引, 左孩子大于右孩子
+            if(min_child_index < m && heap[min_child_index].data.rate > heap[min_child_index+1].data.rate){
+                min_child_index = min_child_index+1;  // min_child_index永远指向值小的那个孩子
+            }
+
+            // 父节点的值小于等于两个孩子的最小值
+            if(heap[parent_index].data.rate <= heap[min_child_index].data.rate){
+                break;   // 循环结束,不需要再调整了
+            }else{
+                // 父节点和子节点的值互换
+                var tmp = heap[parent_index];
+                heap[parent_index] = heap[min_child_index];
+                heap[min_child_index] = tmp;
+                parent_index = min_child_index;
+                min_child_index = 2*min_child_index + 1;
+            }
+        }
+
+    };
+
+    // 传入一个数组,然后调整为最小堆
+    this.init = function(arr){
+        max_size = arr.length;
+        curr_size = max_size;
+        heap = new Array(arr.length);
+        // 填充heap, 目前还不是一个堆
+        for(var i =0; i<curr_size;i++){
+            heap[i] = arr[i];
+        }
+
+        var curr_pos = Math.floor(curr_size/2);      // 这是堆的最后一个分支节点
+        while(curr_pos >= 0){
+            shif_down(curr_pos, curr_size-1);        // 局部自上向下下滑调整
+            curr_pos -= 1;                           // 调整下一个分支节点
+        }
+    };
+
+    var shif_up = function(start){
+        var child_index = start;         // 当前节点是叶节点
+        var parent_index = Math.floor((child_index-1)/2);   // 找到父节点
+
+
+        while(child_index > 0){
+            // 父节点更小,就不用调整了
+            if(heap[parent_index].data.rate <= heap[child_index].data.rate){
+                break;
+            }else{
+                // 父节点和子节点的值互换
+                var tmp = heap[child_index];
+                heap[child_index] = heap[parent_index];
+                heap[parent_index] = tmp;
+                child_index = parent_index;
+                parent_index = Math.floor((parent_index-1)/2);
+            }
+        }
+    };
+
+    this.insert = function(item){
+        // 插入一个新的元素
+        // 堆满了,不能再放元素
+        if(curr_size == max_size){
+            return false;
+        }
+
+        heap[curr_size] = item;
+        shif_up(curr_size);
+        curr_size++;
+        return true;
+    };
+
+    //删除最小值
+    this.remove_min = function(){
+        if(curr_size <= 0){
+            return null;
+        }
+        var min_value = heap[0];
+        heap[0] = heap[curr_size-1];
+        curr_size--;
+        shif_down(0, curr_size-1);
+        return min_value;
+    };
+
+    this.size = function(){
+        return curr_size;
+    };
+
+    this.print = function(){
+        console.log(heap);
+    };
+};
+
+	</script>
+</head>
+<body>
+
+</body>
+</html>

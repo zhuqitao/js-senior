@@ -53,7 +53,7 @@
 			对于一个树，非二叉树，叶节点的数量等于
 		
 		满二叉树：深度为k的有2（k-1）次方个节点，
-		完全二叉树：深度为k的树，从1到k-1都是满的，第k层，或是满的或是不满的
+		完全二叉树：深度为k的树，从1到k-1都是满的，第k层，或是满的或是从右向左连续缺若干个节点
 	*/
 	function Stack () {
 
@@ -390,11 +390,11 @@
 	var node1 = bt.find("D")
 	var node2 = bt.find("G")
 
-	// 首先定义一个可以查找公共节点的函数，接受三个参数，第一个是目标节点，后面两个个是找祖先节点的两个节点，
+	// 首先定义一个可以查找公共节点的函数，接受三个参数，第一个是目标节点，后面两个是找祖先节点的两个节点，
 	// 函数的功能就是判断第一个参数是不是后面两个参数的祖先节点
 	var lowest_common_ancestor = function(root_node, node1, node2) {
 		// 定义递归结束条件
-		if(!root_node || root_node ===node1 || root_node === node2) {
+		if(!root_node || root_node === node1 || root_node === node2) {
 			return root_node
 		}
 		// 先判断第一个参数界定的左子节点是不是他俩的最近公共祖先节点，然后判断右子节点是不是最近的公共祖先节点
@@ -414,7 +414,7 @@
 	}
 
 	var ancestor = lowest_common_ancestor(root_node, node1, node2)
-	console.log(ancestor)
+	console.log('ancestor',ancestor)
 	// 3: 分层打印二叉树						(困难+)
 
 	/*

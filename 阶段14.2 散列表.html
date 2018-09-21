@@ -3,6 +3,58 @@
 <head>
 	<title></title>
 	<script type="text/javascript">
+
+		function murmurhash3_32_gc(key, seed) {
+    var remainder, bytes, h1, h1b, c1, c1b, c2, c2b, k1, i;
+
+    remainder = key.length & 3; // key.length % 4
+    bytes = key.length - remainder;
+    h1 = seed;
+    c1 = 0xcc9e2d51;
+    c2 = 0x1b873593;
+    i = 0;
+
+    while (i < bytes) {
+        k1 =
+            ((key.charCodeAt(i) & 0xff)) |
+            ((key.charCodeAt(++i) & 0xff) << 8) |
+            ((key.charCodeAt(++i) & 0xff) << 16) |
+            ((key.charCodeAt(++i) & 0xff) << 24);
+        ++i;
+
+        k1 = ((((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16))) & 0xffffffff;
+        k1 = (k1 << 15) | (k1 >>> 17);
+        k1 = ((((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16))) & 0xffffffff;
+
+        h1 ^= k1;
+        h1 = (h1 << 13) | (h1 >>> 19);
+        h1b = ((((h1 & 0xffff) * 5) + ((((h1 >>> 16) * 5) & 0xffff) << 16))) & 0xffffffff;
+        h1 = (((h1b & 0xffff) + 0x6b64) + ((((h1b >>> 16) + 0xe654) & 0xffff) << 16));
+    }
+
+    k1 = 0;
+
+    switch (remainder) {
+        case 3: k1 ^= (key.charCodeAt(i + 2) & 0xff) << 16;
+        case 2: k1 ^= (key.charCodeAt(i + 1) & 0xff) << 8;
+        case 1: k1 ^= (key.charCodeAt(i) & 0xff);
+
+            k1 = (((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16)) & 0xffffffff;
+            k1 = (k1 << 15) | (k1 >>> 17);
+            k1 = (((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16)) & 0xffffffff;
+            h1 ^= k1;
+    }
+
+    h1 ^= key.length;
+
+    h1 ^= h1 >>> 16;
+    h1 = (((h1 & 0xffff) * 0x85ebca6b) + ((((h1 >>> 16) * 0x85ebca6b) & 0xffff) << 16)) & 0xffffffff;
+    h1 ^= h1 >>> 13;
+    h1 = ((((h1 & 0xffff) * 0xc2b2ae35) + ((((h1 >>> 16) * 0xc2b2ae35) & 0xffff) << 16))) & 0xffffffff;
+    h1 ^= h1 >>> 16;
+
+    return h1 >>> 0;
+}
 		
 	/*
 	hashtable 
@@ -55,6 +107,7 @@
 		使用链表实现HashTable,但是需要改变一下链表，链表上的每个节点既要存储key，也要存储value,
 		链表还要提供一个search方法和一个remove_key方法
 	*/
+
 	function LinkList() {
 		// 定义一个节点对象
 		var Node = function(key, value) {
@@ -173,9 +226,19 @@
  			}
  			return false
  		}
-
-
-
+ 		this.indexOf = function(key) {
+ 			var curr_ndoe = head
+ 			var index = -1
+ 			while(curr_ndoe) {
+ 				index++
+ 				if(curr_ndoe.key === key) {
+ 					return index
+ 				} else {
+ 					curr_ndoe = curr_ndoe.next
+ 				}
+ 			}
+ 			return -1
+ 		}
 	}
 	
 
@@ -260,7 +323,7 @@
 			return null
 		}
 
-		this.del_key = function(key) {
+		this.remove = function(key) {
 			var index = get_index(key)
 			var res = items[index].remove_key(key)
 			if(res) {
@@ -269,7 +332,7 @@
 			return res
 		}
 
-		this.has_key = function(key) {
+		this.hasKey = function(key) {
 			var index = get_index(key)
 			var node = items[index].remove_key
 			if(node){
@@ -308,8 +371,9 @@
 
 		// 扩容
 		this.expand = function(){
+			console.log('expand')
 			var tmp_arr = new Array(items.length)
-			for (var i = 0; i<items.length, i++){
+			for (var i = 0; i<items.length; i++){
 				tmp_arr = items[i]
 			}
 
@@ -330,7 +394,7 @@
 			}
 
 			// 吧临时数组中的数据导入到items中
-			for(var i = 0; i<tmp_arr.length, i++) {
+			for(var i = 0; i<tmp_arr.length; i++) {
 				var link = tmp_arr[i];
 				// 获得链表的头
 				var curr_ndoe = link.get_head();
@@ -341,9 +405,16 @@
 					curr_ndoe = curr_ndoe.next
 				}
 			}
+			console.log(items)
 		}
 	}
 
+	var hash = new HashTable()
+	hash.init(3);
+	hash.set('name','asd')
+	console.log(hash.get('name'))
+	hash.set('name', 'qwe')
+	console.log(hash.get('name'))
 	
 
 	// 思考题：

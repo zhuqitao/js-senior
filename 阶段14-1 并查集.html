@@ -72,6 +72,24 @@
 			parent[root1] += parent[root2]
 			parent[root2] = root1
 		}
+
+		this.build_friend = function(i, j) {
+			var root1 = this.find(i)
+			var root2 = this.find(j)
+			if(root1 !== root2) {
+				this.union(root1,root2)
+			}
+		}
+
+		this.is_friend =function(i, j) {
+			var root1 = this.find(i)
+			var root2 = this.find(j)
+			return root1 === root2
+		}
+
+		this.get_friend_group_count = function() {
+			for(var i =0; i<parent.length; i++)
+		}
 	}
 
 	/*
@@ -185,6 +203,8 @@
 		最后找数组中小于0的数，有几个小于0的数，就有几个朋友圈
 
 	*/
+
+
 
 
 	</script>

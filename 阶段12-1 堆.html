@@ -67,13 +67,14 @@
 			var min_child_index = parent_index*2 + 1	// 一定有左子节点，现在min_child_index 就是左子节点的索引
 
 			while(min_child_index <= m) {
-				if (min_child_index<m && heap[min_child_index]> head[min_child_index+1]){
+				if (min_child_index<m && heap[min_child_index]> heap[min_child_index+1]){
 					// min_child_index + 1 就是右子节点的索引, 如果右子节点比左节点小，就把min_child_index 指向最小的那个
 					min_child_index = min_child_index + 1
 				}
 
 				if(heap[parent_index] <= heap[min_child_index]) {
 					// 如果父节点小于等于最小的子节点  则不需要调整  循环结束
+					break;
 				} else {
 					// 父节点个子节点的值互换
 					var tep = heap[parent_index]
@@ -104,7 +105,7 @@
 			return true
 		}
 
-		shift_up(start) {
+		function shift_up(start) {
 			// 当前节点是叶节点
 			var child_index = start;
 
@@ -139,6 +140,17 @@
 			return min_value
 		}
 
+		this.get_min = function() {
+			if(curr_size>0) {
+				return heap[0]
+			}
+			return null
+		}
+
+		this.print = function() {
+			console.log(heap)
+		}
+
 		// 实现 size.print,get_min 方法
 	}
 
@@ -168,7 +180,7 @@
 
 	*/
 	// 找到最大的3个数
-	var arr [5,2,9,6,8,5,15]
+	var arr = [5,2,9,6,8,5,15]
 	var min_heap = new MinHeap(3)
 	for(var i = 0; i<3; i++) {
 		min_heap.insert(arr[i])
@@ -185,17 +197,7 @@
 	// 课后作业  实现最大堆
 
 	// ————————————————————————————————
-	// 哈弗曼树
-	/*
-		概念：
-		1. 路径长度
-			路径：从数中一个节点到另一个节点之间的分支构成两点之间的路径
-			路径长度：路径上的分支条数，树的路径长度是从根节点到每一个节点的路径总和
-
-		节点数相同的情况下，完全二叉树的路径长度最小
-
-		2. 带权路径长度
-	*/
+	
 
 
 	</script>
