@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script type="text/javascript">
+		
+	// 实现一个栈
+	function Stack() {
+		var items = [];
+
+		this.push = function(item) {
+			items.push(item)
+		}
+
+		this.pop = function() {
+			return items.pop()
+		}
+
+		this.top = function() {
+			if(items.length>0) {
+				return items[items.length-1]
+			}
+			return null;
+		}
+
+		this.isEmpty = function() {
+			return items.length === 0;
+		}
+
+		this.clear = function() {
+			items = []
+		}
+
+		this.size = function() {
+			return items.length
+		}
+	}
+
+	// 问题1：判断"(sjhjg)(abc)))wet(w(sg)olg)"这个字符串是否合法。
+	/*
+		思路：
+			1 遇见左括号 入栈
+			2 遇见右括号 判断栈是否为空，如果为空，则说明缺少左括号，否则出栈
+	*/
+	function string_reg(str) {
+		var stack = new Stack()
+		for(var i=0; i<str.length; i++) {
+			var item = str[i]
+			if(str[i] === '('){
+				stack.push("")
+			}
+		}
+	}
+	/*
+		问题2：实现计算机中后缀表达式的计算方法。
+
+			中缀表达式：操作符处于操作数的中间（例：3 + 4）；
+			后缀表达式：指的是不包含括号，运算符放在两个运算对象的后面，所有的计算按运算符出现的顺序，严格从左向右进行（不再考虑运算符的优先规则）
+		思路：
+			先给一个后缀表达式： ["1","4","2","/","+"],对应的中缀表达式： 1+(4/2)
+  
+			  (1) 遍历中缀表达式，遇到数字则入栈，
+			  (2) 遇到计算符号，栈弹出两个元素进行计算，并把结果入栈,
+			  (3) 最后栈内只剩一个元素，改元素就是计算的结果
+	*/
+	function calc_exp(exp) {
+		var count_exp = ['+', '-', '*', '/']
+		var stack = new Stack()
+		for(var i=0;i<exp.length;i++){
+
+			var item = exp[i]
+			if(count_exp.indexOf(item) > -1) {
+				var count1 = stack.pop()
+				var count2 = stack.pop()
+				var string = count2 + item + count1
+				var result = eval(string)
+				console.log(count1, count2)
+				stack.push(result.toString())
+			} else {
+				stack.push(item)
+			}
+		}
+		return stack.pop()
+	}
+	console.log(calc_exp(["1","4","2","/","+"]))
+
+	// 实现一个有min方法的栈
+
+	function MinStack() {
+		var min_arr = []
+		var data_arr = []
+
+		this.push = function(item) {
+			data_arr.push(item)
+			if(min_arr.length === 0) {
+				min_arr.push(item)
+			} else {
+				if(item < min_arr[min_arr.length-1]){
+					min_arr.push(item)
+				}
+			}
+		}
+
+		this.min = function() {
+			return min_arr[min_arr.length-1]
+		}
+		this.pop = function() {
+			min_arr.pop()
+			data_arr.pop()
+		}
+	}
+	var min_stack = new MinStack()
+	min_stack.push(3)
+	min_stack.push(7)
+	min_stack.push(2)
+	min_stack.push(1)
+	min_stack.pop()
+	console.log(min_stack.min())
+	
+
+	</script>
+</head>
+<body>
+
+</body>
+</html>

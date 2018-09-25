@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script type="text/javascript">
+		
+	// 实现一个队列
+	/*
+		enqueue() 从队尾添加一个元素
+		dequeue() 从队头删除一个元素
+		head()	  返回头元素
+		size()	  返回队列的大小
+		clear()
+		isEmpty()
+		tail()		返回队列的尾节点
+	*/
+	function Queue() {
+		var arr = []
+
+		this.enqueue = function(item) {
+			arr.push(item)
+		}
+		this.dequeue = function() {
+			return arr.shift()
+		}
+		this.head = function() {
+			return arr[0]
+		}
+		this.size = function() {
+			return arr.length
+		}
+		this.clear = function() {
+			arr = []
+		}
+		this.isEmpty = function() {
+			return arr.length === 0
+		}
+		this.tail = function() {
+			return arr[arr.length-1]
+		}
+	}
+
+	/* 1: 约瑟夫环
+		数组a[100]存放0~99，每隔两个数删除一个数，到末尾循环到开头继续进行，求最后一个被删除的数
+
+		思路：
+		
+	*/
+	function del_ring(arr_list) {
+		var queue = new Queue()
+		for (var i=0; i<arr_list.length; i++){
+			queue.enqueue(arr_list[i])
+		}
+		var curr_index = 1
+
+		while(queue.size()>1) {
+			var tmp = queue.dequeue()
+
+			if(curr_index%3 !== 0) {
+				queue.enqueue(tmp)
+			}
+			curr_index++
+		}
+		return queue.head()
+	}
+
+	var arr_tmp = []
+	for(var i=1; i<=100; i++) {
+		arr_tmp.push(i)
+	}
+	console.log(del_ring(arr_tmp))
+
+	/*
+		2: 斐波那契数列
+		斐波那契数列的前两项是 1、1， 此后每个元素都是前两个元素的和，f(n) = f(n-1) + f(n-2)
+		求第n（n>2）个数是多少
+
+		思路：
+		
+	*/
+
+	function fibonacci(n) {
+		var queue = new Queue()
+		queue.enqueue(1)
+		queue.enqueue(1)
+
+		var curr_index = 1
+		while(curr_index <= n-2) {
+			var item1 = queue.dequeue()
+			var item2 = queue.head()
+
+			var res = item1+item2
+			queue.enqueue(res)
+
+			curr_index++
+		}
+		queue.dequeue()
+		return queue.dequeue()
+	}
+
+	console.log(fibonacci(10))
+
+	
+	
+	</script>
+</head>
+<body>
+
+</body>
+</html>
